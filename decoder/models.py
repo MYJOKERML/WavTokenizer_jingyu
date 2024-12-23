@@ -6,7 +6,7 @@ from torch import nn
 from torch.nn.utils import weight_norm
 
 from decoder.modules import ConvNeXtBlock, ResBlock1, AdaLayerNorm
-from decoder.transformer import StreamingTransformer
+# from decoder.transformer import StreamingTransformer
 import torch.nn.functional as F
 
 
@@ -203,7 +203,7 @@ class VocosBackbone(Backbone):
         self.temb_ch = 0
         block_in = dim
         dropout = 0.1
-        attn_type="transformer"
+        attn_type="vanilla"
 
         pos_net : tp.List[nn.Module] = [
             ResnetBlock(in_channels=block_in,out_channels=block_in,
