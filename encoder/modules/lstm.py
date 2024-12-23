@@ -30,10 +30,12 @@ class SLSTM(nn.Module):
     # 修改transpose顺序
     def forward(self, x):
         # # 插入reshape
-        # x = x.reshape(x.shape)
-        x1 = x.permute(2, 0, 1)
-        y, _ = self.lstm(x1)
-        y = y.permute(1, 2, 0)
+        # x: (B, C, L)
+        # batch_first is default False
+        # so x1 should be (L, B, C)
+        x1 = x.permute(2, 0, 1) # (L, B, C)
+        y, _ = self.lstm(x1) # (L, B, C)
+        y = y.permute(1, 2, 0) # (B, C, L)
         if self.skip:
             y = y + x
         return y

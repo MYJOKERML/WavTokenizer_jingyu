@@ -10,11 +10,11 @@ import yaml
 from decoder.discriminator_dac import DACDiscriminator
 
 from decoder.discriminators import MultiPeriodDiscriminator, MultiResolutionDiscriminator
-from decoder.feature_extractors import FeatureExtractor
-from decoder.heads import FourierHead
+from decoder.feature_extractors import FeatureExtractor, EncodecFeatures
+from decoder.heads import FourierHead, ISTFTHead
 from decoder.helpers import plot_spectrogram_to_numpy
 from decoder.loss import DiscriminatorLoss, GeneratorLoss, FeatureMatchingLoss, MelSpecReconstructionLoss, DACGANLoss
-from decoder.models import Backbone
+from decoder.models import Backbone, VocosBackbone
 from decoder.modules import safe_log
 from decoder.pretrained_model import instantiate_class
 
@@ -472,3 +472,12 @@ class WavTokenizer(VocosExp):
             )
 
         super().validation_epoch_end(outputs)
+
+if __name__ == "__main__":
+    # test
+    x = torch.randn(1, 1, 12340)
+    feature_extractor = EncodecFeatures(encodec_model='encodec_24khz', bandwidths=[6.6, 6.6, 6.6, 6.6], train_codebooks=True, num_quantizers=1, dowmsamples=[8,5,4,2], vq_bins=4096,vq_kmeans=200)
+    backbone = VocosBackbone(input_channels=512, dim=768, intermediate_dim=2304, num_layers=12, adanorm_num_embeddings=4)
+    head = ISTFTHead(dim=768, n_fft=1280, hop_length=320, padding='same')
+    model = WavTokenizer(feature_extractor, backbone, head, resume_config='config.yaml', resume_model='model.ckpt')
+    

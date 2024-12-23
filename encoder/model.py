@@ -23,7 +23,7 @@ ROOT_URL = 'https://dl.fbaipublicfiles.com/encodec/v0/'
 
 EncodedFrame = tp.Tuple[torch.Tensor, tp.Optional[torch.Tensor]]
 
-
+# NOT USED
 class LMModel(nn.Module):
     """Language Model to estimate probabilities of each codebook entry.
     We predict all codebooks in parallel for a given time step.

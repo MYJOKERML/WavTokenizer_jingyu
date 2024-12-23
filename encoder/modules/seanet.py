@@ -14,8 +14,10 @@ import torch.nn as nn
 from . import (
     SConv1d,
     SConvTranspose1d,
-    SLSTM
+    SLSTM,
 )
+
+from .transformer_module import STransformerEncoder
 
 
 class SEANetResnetBlock(nn.Module):
@@ -87,12 +89,14 @@ class SEANetEncoder(nn.Module):
             (streamable) convolution as the skip connection in the residual network blocks.
         compress (int): Reduced dimensionality in residual branches (from Demucs v3).
         lstm (int): Number of LSTM layers at the end of the encoder.
+        att_type (str): Attention type, should be in ['lstm', 'transformer', 'none'].
     """
     def __init__(self, channels: int = 1, dimension: int = 128, n_filters: int = 32, n_residual_layers: int = 1,
                  ratios: tp.List[int] = [8, 5, 4, 2], activation: str = 'ELU', activation_params: dict = {'alpha': 1.0},
                  norm: str = 'weight_norm', norm_params: tp.Dict[str, tp.Any] = {}, kernel_size: int = 7,
                  last_kernel_size: int = 7, residual_kernel_size: int = 3, dilation_base: int = 2, causal: bool = False,
-                 pad_mode: str = 'reflect', true_skip: bool = False, compress: int = 2, lstm: int = 2):
+                 pad_mode: str = 'reflect', true_skip: bool = False, compress: int = 2, lstm: int = 2, att_type: str = 'transformer',
+                 hidden_scale: float = 4., num_heads: int = 8, num_layers: int = 5):
         super().__init__()
         self.channels = channels
         self.dimension = dimension
@@ -129,8 +133,12 @@ class SEANetEncoder(nn.Module):
             ]
             mult *= 2
 
-        if lstm:
+        assert att_type in ['lstm', 'transformer', 'none'], f"att_type should be in ['lstm', 'transformer', 'none'], but got {att_type}"
+        if att_type == 'lstm' and lstm:
             model += [SLSTM(mult * n_filters, num_layers=lstm)]
+        elif att_type == 'transformer':
+            model += [STransformerEncoder(mult * n_filters, hidden_scale=hidden_scale, num_heads=num_heads,
+                                           num_layers=num_layers)]
 
         model += [
             act(**activation_params),
