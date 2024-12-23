@@ -5,6 +5,7 @@ from torch import nn
 from torch.nn.utils import weight_norm, remove_weight_norm
 
 
+
 class ConvNeXtBlock(nn.Module):
     """ConvNeXt Block adapted from https://github.com/facebookresearch/ConvNeXt to 1D audio signal.
 

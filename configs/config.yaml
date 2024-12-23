@@ -7,14 +7,14 @@ data:
       filelist_path: data/train.txt
       sampling_rate: 24000
       num_samples: 72000
-      batch_size: 10  # 20
+      batch_size: 1  # 20
       num_workers: 8
 
     val_params:
       filelist_path: data/val.txt
       sampling_rate: 24000
       num_samples: 72000
-      batch_size: 5   # 10
+      batch_size: 1   # 10
       num_workers: 8
 
 model:

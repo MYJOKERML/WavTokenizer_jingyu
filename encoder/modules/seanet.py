@@ -17,8 +17,7 @@ from . import (
     SLSTM,
 )
 
-from .transformer_module import STransformerEncoder
-
+from .transformer import STransformerEncoder
 
 class SEANetResnetBlock(nn.Module):
     """Residual block from SEANet model.
@@ -95,7 +94,7 @@ class SEANetEncoder(nn.Module):
                  ratios: tp.List[int] = [8, 5, 4, 2], activation: str = 'ELU', activation_params: dict = {'alpha': 1.0},
                  norm: str = 'weight_norm', norm_params: tp.Dict[str, tp.Any] = {}, kernel_size: int = 7,
                  last_kernel_size: int = 7, residual_kernel_size: int = 3, dilation_base: int = 2, causal: bool = False,
-                 pad_mode: str = 'reflect', true_skip: bool = False, compress: int = 2, lstm: int = 2, att_type: str = 'transformer',
+                 pad_mode: str = 'reflect', true_skip: bool = False, compress: int = 2, lstm: int = 2, att_type: str = 'lstm',
                  hidden_scale: float = 4., num_heads: int = 8, num_layers: int = 5):
         super().__init__()
         self.channels = channels
