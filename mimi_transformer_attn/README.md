@@ -40,8 +40,9 @@ We have noticed that several works (approximately exceed ten recent months) have
 To use WavTokenizer, install it using:
 
 ```bash
-conda create -n wavtokenizer python=3.9
+conda create -n wavtokenizer python=3.10
 conda activate wavtokenizer
+pip install pip==24.0
 pip install -r requirements.txt
 ```
 
