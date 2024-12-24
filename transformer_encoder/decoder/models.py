@@ -1,13 +1,10 @@
 from typing import Optional
-import typing as tp
 
 import torch
 from torch import nn
 from torch.nn.utils import weight_norm
 
 from decoder.modules import ConvNeXtBlock, ResBlock1, AdaLayerNorm
-from decoder.transformer import StreamingTransformer
-import torch.nn.functional as F
 
 
 def nonlinearity(x):
@@ -130,12 +127,10 @@ class AttnBlock(nn.Module):
         return x + h_
 
 def make_attn(in_channels, attn_type="vanilla"):
-    assert attn_type in ["vanilla", "linear", "none", "transformer"], f'attn_type {attn_type} unknown'
+    assert attn_type in ["vanilla", "linear", "none"], f'attn_type {attn_type} unknown'
     # print(f"making attention of type '{attn_type}' with {in_channels} in_channels")
     if attn_type == "vanilla":
         return AttnBlock(in_channels)
-    if attn_type == "transformer":
-        return StreamingTransformer(in_channels, 8, 4, dim_feedforward=in_channels*4)
 
 
 class Backbone(nn.Module):
@@ -203,7 +198,7 @@ class VocosBackbone(Backbone):
         self.temb_ch = 0
         block_in = dim
         dropout = 0.1
-        attn_type="transformer"
+        attn_type="vanilla"
 
         pos_net : tp.List[nn.Module] = [
             ResnetBlock(in_channels=block_in,out_channels=block_in,

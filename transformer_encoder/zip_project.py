@@ -61,5 +61,5 @@ def create_zip_archive(archive_name='archive.zip', base_dir='.'):
     print(f"压缩完成：{archive_name}")
 
 if __name__ == "__main__":
-    archive_name = 'mimi_transformer_attn.zip'
+    archive_name = 'transformer_encoder.zip'
     create_zip_archive(archive_name=archive_name)
