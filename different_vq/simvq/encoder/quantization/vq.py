@@ -14,6 +14,7 @@ import torch
 from torch import nn
 
 from .core_vq import ResidualVectorQuantization,LanguageVectorQuantization
+from .sim_vq import SimVQ1D
 
 
 @dataclass
@@ -61,15 +62,20 @@ class ResidualVectorQuantizer(nn.Module):
 
         # breakpoint()
 
-        self.vq = LanguageVectorQuantization(
-            dim=self.dimension,
-            codebook_size=self.bins,
-            num_quantizers=self.n_q,
-            decay=self.decay,
-            kmeans_init=self.kmeans_init,
-            kmeans_iters=self.kmeans_iters,
-            threshold_ema_dead_code=self.threshold_ema_dead_code,
+        self.vq = SimVQ1D(
+            n_e=self.bins,
+            e_dim=self.dimension,
         )
+
+        # self.vq = LanguageVectorQuantization(
+        #     dim=self.dimension,
+        #     codebook_size=self.bins,
+        #     num_quantizers=self.n_q,
+        #     decay=self.decay,
+        #     kmeans_init=self.kmeans_init,
+        #     kmeans_iters=self.kmeans_iters,
+        #     threshold_ema_dead_code=self.threshold_ema_dead_code,
+        # )
         # self.vq = ResidualVectorQuantization(
         #     dim=self.dimension,
         #     codebook_size=self.bins,
