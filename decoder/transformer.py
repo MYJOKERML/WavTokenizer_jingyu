@@ -18,10 +18,10 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from ..utils.compile import no_compile
-from .gating import make_gating
-from .rope import RotaryEmbedding
-from .streaming import StreamingModule, StreamingContainer
+from utils.compile import no_compile
+from decoder.gating import make_gating
+from decoder.rope import RotaryEmbedding
+from decoder.streaming import StreamingModule, StreamingContainer
 
 
 class LayerNormF32(nn.LayerNorm):
@@ -748,3 +748,4 @@ class ProjectedTransformer(StreamingContainer):
                 y = y.transpose(1, 2)
             ys.append(y)
         return ys
+    

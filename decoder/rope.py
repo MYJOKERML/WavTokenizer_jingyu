@@ -5,7 +5,7 @@
 from torch import nn
 import math
 import torch
-from ..utils.compile import torch_compile_lazy
+from utils.compile import torch_compile_lazy
 
 
 @torch_compile_lazy

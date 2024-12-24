@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from ..utils.compile import torch_compile_lazy
+from utils.compile import torch_compile_lazy
 
 
 @torch_compile_lazy
