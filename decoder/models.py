@@ -6,7 +6,7 @@ from torch import nn
 from torch.nn.utils import weight_norm
 
 from decoder.modules import ConvNeXtBlock, ResBlock1, AdaLayerNorm
-from encoder.modules.transformer import STransformerEncoder
+from decoder.transformer import StreamingTransformer
 import torch.nn.functional as F
 
 
@@ -135,7 +135,7 @@ def make_attn(in_channels, attn_type="vanilla"):
     if attn_type == "vanilla":
         return AttnBlock(in_channels)
     if attn_type == "transformer":
-        return STransformerEncoder(in_channels, hidden_scale=4, num_heads=8, num_layers=5)
+        return StreamingTransformer(in_channels, 4, 5, dim_feedforward=in_channels*4)
 
 
 class Backbone(nn.Module):

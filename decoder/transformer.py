@@ -672,6 +672,7 @@ class StreamingTransformer(StreamingModule[_TransformerState]):
         return _TransformerState(offset=torch.zeros(1, device=device, dtype=torch.long))
 
     def forward(self, x: torch.Tensor, *args, **kwargs):
+        x = rearrange(x, "B C T -> B T C")
         B, T, C = x.shape
 
         state = self._streaming_state
@@ -693,6 +694,7 @@ class StreamingTransformer(StreamingModule[_TransformerState]):
 
         if state is not None:
             state.offset.add_(T)
+        x = rearrange(x, "B T C -> B C T")
         return x
 
 
