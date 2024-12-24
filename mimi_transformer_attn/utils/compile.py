@@ -13,6 +13,7 @@ from functools import wraps
 import inspect
 import os
 import typing as tp
+from typing import Optional
 
 import torch
 from torch import cuda
@@ -202,9 +203,9 @@ class CUDAGraphed:
         self.func = func
         self.warmup_steps = warmup_steps
         self.disable = disable
-        self._graph: cuda.CUDAGraph | None = None
-        self._output: tuple | None = None
-        self._args: tuple | None = None
+        self._graph: Optional[cuda.CUDAGraph] = None # replace |
+        self._output: Optional[tuple] = None # replace |
+        self._args: Optional[tuple] = None # replace |
 
     def reset(self, warmup_steps: int = 0) -> None:
         """Reset the state, meaning the next call we get CUDA Graphed again. Useful if some

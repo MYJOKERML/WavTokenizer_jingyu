@@ -6,3 +6,4 @@ metrics/wavtokenizer_medium_music_audio_320_24k.ckpt
 metrics/wav2vec_small.pt
 wavtokenizer
 test.py
+**/__pycache__/

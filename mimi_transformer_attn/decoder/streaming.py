@@ -18,6 +18,7 @@ from dataclasses import dataclass
 import itertools
 import math
 import typing as tp
+from typing import Optional
 from torch import nn
 import torch
 
@@ -46,7 +47,7 @@ class StreamingModule(abc.ABC, nn.Module, tp.Generic[State]):
     """
     def __init__(self) -> None:
         super().__init__()
-        self._streaming_state: State | None = None
+        self._streaming_state: Optional[State] = None # replace |
         self._streaming_detached: bool = False
 
     @property
@@ -162,8 +163,8 @@ class StreamingContainer(StreamingModule[_NullState]):
 
 @dataclass
 class _StreamingAddState:
-    previous_x: torch.Tensor | None = None
-    previous_y: torch.Tensor | None = None
+    previous_x: Optional[torch.Tensor] = None # replace |
+    previous_y: Optional[torch.Tensor] = None # replace |
 
     def reset(self):
         self.previous_x = None
@@ -192,7 +193,7 @@ class StreamingAdd(StreamingModule[_StreamingAddState]):
 
 @dataclass
 class _StreamingConvState:
-    previous: torch.Tensor | None = None
+    previous: Optional[torch.Tensor] = None # replace |
 
     def reset(self):
         self.previous = None
@@ -242,7 +243,7 @@ class RawStreamingConv1d(nn.Conv1d, StreamingModule[_StreamingConvState]):
 
 @dataclass
 class _StreamingConvTrState:
-    partial: torch.Tensor | None = None
+    partial: Optional[torch.Tensor] = None
 
     def reset(self):
         self.partial = None

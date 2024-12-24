@@ -12,6 +12,7 @@ See `StreamingTransformer` for more information.
 from contextlib import ExitStack
 from dataclasses import dataclass
 import typing as tp
+from typing import Optional, List, Union
 
 from einops import rearrange
 import torch
@@ -458,7 +459,7 @@ class StreamingTransformerLayer(StreamingModule[_LayerState]):
         self,
         d_model: int,
         num_heads: int,
-        dim_feedforward: int | list[int] = 2048,
+        dim_feedforward: Union[int, List[int]] = 2048, # replace | with Union
         causal: bool = False,
         context: tp.Optional[int] = None,
         rope: tp.Optional[RotaryEmbedding] = None,
@@ -626,7 +627,7 @@ class StreamingTransformer(StreamingModule[_TransformerState]):
         d_model: int,
         num_heads: int,
         num_layers: int,
-        dim_feedforward: int | list[int] = 2048,
+        dim_feedforward: Union[int, List[int]] = 2048, # replace | with Union
         causal: bool = False,
         context: tp.Optional[int] = None,
         positional_embedding: str = "sin",
