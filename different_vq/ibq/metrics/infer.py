@@ -9,8 +9,9 @@ import numpy as np
 import torch
 import math
 from pystoi import stoi
+from tqdm import tqdm
 
-device=torch.device('cuda:0')
+device=torch.device('cuda:3')
 
 # 如果是ljspeech，需要更换路径，更换数据读取逻辑，更换stoi的采样率
 
@@ -21,7 +22,7 @@ def main():
     preaudio = os.listdir(prepath)
     rawaudio = []
 
-    UTMOS=UTMOSScore(device='cuda:0')
+    UTMOS=UTMOSScore(device)
     
     # libritts
     for i in range(len(preaudio)):
@@ -40,8 +41,10 @@ def main():
     stoi_sumpre=[]
     f1score_filt=0
 
-    for i in range(len(preaudio)):
-        print(i)
+    log_file=open("log.txt","w")
+    for i in tqdm(range(len(preaudio))):
+        log_file.write("************%d************\n"%(i))
+        # print(i)
         rawwav,rawwav_sr=torchaudio.load(rawaudio[i])
         prewav,prewav_sr=torchaudio.load(prepath+"/"+preaudio[i])
         # breakpoint()
@@ -52,10 +55,11 @@ def main():
         rawwav_16k=torchaudio.functional.resample(rawwav, orig_freq=rawwav_sr, new_freq=16000)  #测试UTMOS的时候必须重采样
         prewav_16k=torchaudio.functional.resample(prewav, orig_freq=prewav_sr, new_freq=16000)
 
-
         # 1.UTMOS
-        print("****UTMOS_raw",i,UTMOS.score(rawwav_16k.unsqueeze(1))[0].item())
-        print("****UTMOS_encodec",i,UTMOS.score(prewav_16k.unsqueeze(1))[0].item())
+        # print("****UTMOS_raw",i,UTMOS.score(rawwav_16k.unsqueeze(1))[0].item())
+        # print("****UTMOS_encodec",i,UTMOS.score(prewav_16k.unsqueeze(1))[0].item())
+        log_file.write("****UTMOS_raw %d %f\n"%(i,UTMOS.score(rawwav_16k.unsqueeze(1))[0].item()))
+        log_file.write("****UTMOS_encodec %d %f\n"%(i,UTMOS.score(prewav_16k.unsqueeze(1))[0].item()))
         utmos_sumgt+=UTMOS.score(rawwav_16k.unsqueeze(1))[0].item()
         utmos_sumencodec+=UTMOS.score(prewav_16k.unsqueeze(1))[0].item()
     
@@ -67,7 +71,8 @@ def main():
         rawwav_16k_pesq=rawwav_16k[:,:min_len].squeeze(0)
         prewav_16k_pesq=prewav_16k[:,:min_len].squeeze(0)
         pesq_score = pesq(16000, rawwav_16k_pesq.cpu().numpy(), prewav_16k_pesq.cpu().numpy(), "wb", on_error=1)
-        print("****PESQ",i,pesq_score)
+        # print("****PESQ",i,pesq_score)
+        log_file.write("****PESQ %d %f\n"%(i,pesq_score))
         pesq_sumpre+=pesq_score
         # breakpoint()
 
@@ -76,10 +81,12 @@ def main():
         rawwav_16k_f1score=rawwav_16k[:,:min_len]
         prewav_16k_f1score=prewav_16k[:,:min_len]
         periodicity_loss, pitch_loss, f1_score = calculate_periodicity_metrics(rawwav_16k_f1score,prewav_16k_f1score)
-        print("****f1",periodicity_loss, pitch_loss, f1_score,f1score_sumpre)
+        # print("****f1",periodicity_loss, pitch_loss, f1_score,f1score_sumpre)
+        log_file.write("****F1_score %d %f %f %f\n"%(i,periodicity_loss, pitch_loss, f1_score))
         if(math.isnan(f1_score)):
             f1score_filt+=1
-            print("*****",f1score_filt)
+            # print("*****",f1score_filt)
+            log_file.write("****F1_score %d %f %f %f\n"%(i,periodicity_loss, pitch_loss, f1_score))
         else:
             f1score_sumpre+=f1_score
         # breakpoint()
@@ -101,7 +108,8 @@ def main():
         rawwav_stoi=rawwav[:,:min_len].squeeze(0)
         prewav_stoi=prewav[:,:min_len].squeeze(0)
         tmp_stoi=stoi(rawwav_stoi.cpu(),prewav_stoi.cpu(),rawwav_sr,extended=False)
-        print("****stoi",tmp_stoi)
+        # print("****stoi",tmp_stoi)
+        log_file.write("****STOI %d %f\n"%(i,tmp_stoi))
         stoi_sumpre.append(tmp_stoi)
 
     print("*************UTMOS_raw",utmos_sumgt,utmos_sumgt/len(preaudio))
@@ -109,7 +117,12 @@ def main():
     print("*************PESQ:",pesq_sumpre,pesq_sumpre/len(preaudio))
     print("*************F1_score:",f1score_sumpre,f1score_sumpre/(len(preaudio)-f1score_filt),f1score_filt)
     print("*************STOI:",np.mean(stoi_sumpre))
-    
+    log_file.write("*************UTMOS_raw %f %f\n"%(utmos_sumgt,utmos_sumgt/len(preaudio)))
+    log_file.write("*************UTMOS_encodec %f %f\n"%(utmos_sumgt,utmos_sumencodec/len(preaudio)))
+    log_file.write("*************PESQ: %f %f\n"%(pesq_sumpre,pesq_sumpre/len(preaudio)))
+    log_file.write("*************F1_score: %f %f %d\n"%(f1score_sumpre,f1score_sumpre/(len(preaudio)-f1score_filt),f1score_filt))
+    log_file.write("*************STOI: %f\n"%(np.mean(stoi_sumpre)))
+    log_file.close()
     
 
 if __name__=="__main__":
