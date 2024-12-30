@@ -4,17 +4,17 @@ data:
   class_path: decoder.dataset.VocosDataModule
   init_args:
     train_params:
-      filelist_path: data/train.txt
+      filelist_path: ./WavTokenizer/data/train/libritts_train
       sampling_rate: 24000
       num_samples: 72000
-      batch_size: 1  # 20
+      batch_size: 40  # 20
       num_workers: 8
 
     val_params:
-      filelist_path: data/val.txt
+      filelist_path: ./WavTokenizer/data/infer/librttts_val
       sampling_rate: 24000
       num_samples: 72000
-      batch_size: 1   # 10
+      batch_size: 5   # 10
       num_workers: 8
 
 model:
@@ -33,8 +33,8 @@ model:
     evaluate_periodicty: true
 
     resume: false
-    resume_config: ./WavTokenizer/configs/wavtokenizer_smalldata_frame75_3s_nq1_code16384_dim512_kmeans800_attn.yaml
-    resume_model: ./WavTokenizer/result/train/wavtokenizer_smalldata_frame75_3s_nq1_code16384_dim512_kmeans800_attn/xxx.ckpt
+    resume_config: ./WavTokenizer/configs/wavtokenizer_smalldata_frame40_3s_nq1_code16384_dim512_kmeans800_attn.yaml
+    resume_model: ./version_3/checkpoints/xxx.ckpt
 
     feature_extractor:
       class_path: decoder.feature_extractors.EncodecFeatures
@@ -43,8 +43,8 @@ model:
         bandwidths: [6.6, 6.6, 6.6, 6.6]
         train_codebooks: true
         num_quantizers: 1  
-        dowmsamples: [8, 5, 4, 2]
-        vq_bins: 8192
+        dowmsamples: [6, 5, 5, 4]
+        vq_bins: 4096
         vq_kmeans: 200
 
     backbone:
@@ -60,15 +60,15 @@ model:
       class_path: decoder.heads.ISTFTHead
       init_args:
         dim: 768
-        n_fft: 1280 
-        hop_length: 320  
+        n_fft: 2400 
+        hop_length: 600
         padding: same
 
 trainer:
   logger:
     class_path: pytorch_lightning.loggers.TensorBoardLogger
     init_args:
-      save_dir: result/train/wavtokenizer_smalldata_frame75_3s_nq1_code4096_dim512_kmeans200_attn/
+      save_dir: ./WavTokenizer/result/train/wavtokenizer_smalldata_frame40_3s_nq1_code4096_dim512_kmeans200_attn/
   callbacks:
     - class_path: pytorch_lightning.callbacks.LearningRateMonitor
     - class_path: pytorch_lightning.callbacks.ModelSummary
@@ -86,8 +86,8 @@ trainer:
   # This equals to 1M steps per generator and 1M per discriminator
   max_steps: 20000000
   # You might want to limit val batches when evaluating all the metrics, as they are time-consuming
-  limit_val_batches: 100
+  limit_val_batches: 200
   accelerator: gpu
   strategy: ddp
-  devices: [0]
+  devices: [0,1,2,3,4,5,6,7]
   log_every_n_steps: 1000

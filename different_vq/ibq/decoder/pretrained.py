@@ -6,8 +6,8 @@ import yaml
 from huggingface_hub import hf_hub_download
 from torch import nn
 from decoder.feature_extractors import FeatureExtractor, EncodecFeatures
-from decoder.heads import FourierHead, ISTFTHead
-from decoder.models import Backbone, VocosBackbone
+from decoder.heads import FourierHead
+from decoder.models import Backbone
 
 
 def instantiate_class(args: Union[Any, Tuple[Any, ...]], init: Dict[str, Any]) -> Any:
@@ -98,17 +98,11 @@ class WavTokenizer(nn.Module):
         Class method to create a new Vocos model instance from a pre-trained model stored in the Hugging Face model hub.
         """
         model = self.from_hparams0802(config_path)
-        # with open('raw_model_keys.txt', 'w') as f:
-        #     for key in model.state_dict().keys():
-        #         f.write(key + '\n')
         state_dict_raw = torch.load(model_path, map_location="cpu")['state_dict']
         state_dict = dict()
         for k, v in state_dict_raw.items():
             if k.startswith('backbone.') or k.startswith('head.') or k.startswith('feature_extractor.'):
                 state_dict[k] = v
-        # with open('pretrain_model_keys.txt', 'w') as f:
-        #     for key in state_dict.keys():
-        #         f.write(key + '\n')
         # if isinstance(model.feature_extractor, EncodecFeatures):
         #     encodec_parameters = {
         #         "feature_extractor.encodec." + key: value

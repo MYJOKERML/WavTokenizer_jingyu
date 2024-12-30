@@ -394,10 +394,6 @@ class WavTokenizer(VocosExp):
             # feature_extractor = instantiate_class(args=(), init=config['model']['init_args']["feature_extractor"])
             # backbone = instantiate_class(args=(), init=config['model']['init_args']["backbone"])
             # head = instantiate_class(args=(), init=config['model']['init_args']["head"])
-            encoder_missing_keys = ["model.13.layers.0.self_attn.in_proj_weight", "model.13.layers.0.self_attn.out_proj.weight", "model.13.layers.0.norm1.weight", "model.13.layers.0.norm1.bias", "model.13.layers.0.norm2.weight", "model.13.layers.0.norm2.bias", "model.13.layers.0.linear1.weight", "model.13.layers.0.linear2.weight", "model.13.layers.1.self_attn.in_proj_weight", "model.13.layers.1.self_attn.out_proj.weight", "model.13.layers.1.norm1.weight", "model.13.layers.1.norm1.bias", "model.13.layers.1.norm2.weight", "model.13.layers.1.norm2.bias", "model.13.layers.1.linear1.weight", "model.13.layers.1.linear2.weight", "model.13.layers.2.self_attn.in_proj_weight", "model.13.layers.2.self_attn.out_proj.weight", "model.13.layers.2.norm1.weight", "model.13.layers.2.norm1.bias", "model.13.layers.2.norm2.weight", "model.13.layers.2.norm2.bias", "model.13.layers.2.linear1.weight", "model.13.layers.2.linear2.weight", "model.13.layers.3.self_attn.in_proj_weight", "model.13.layers.3.self_attn.out_proj.weight", "model.13.layers.3.norm1.weight", "model.13.layers.3.norm1.bias", "model.13.layers.3.norm2.weight", "model.13.layers.3.norm2.bias", "model.13.layers.3.linear1.weight", "model.13.layers.3.linear2.weight"]
-            encoder_unexpected_keys = ["model.13.lstm.weight_ih_l0", "model.13.lstm.weight_hh_l0", "model.13.lstm.bias_ih_l0", "model.13.lstm.bias_hh_l0", "model.13.lstm.weight_ih_l1", "model.13.lstm.weight_hh_l1", "model.13.lstm.bias_ih_l1", "model.13.lstm.bias_hh_l1"]
-            decoder_missing_keys = ["model.1.layers.0.self_attn.in_proj_weight", "model.1.layers.0.self_attn.out_proj.weight", "model.1.layers.0.norm1.weight", "model.1.layers.0.norm1.bias", "model.1.layers.0.norm2.weight", "model.1.layers.0.norm2.bias", "model.1.layers.0.linear1.weight", "model.1.layers.0.linear2.weight", "model.1.layers.1.self_attn.in_proj_weight", "model.1.layers.1.self_attn.out_proj.weight", "model.1.layers.1.norm1.weight", "model.1.layers.1.norm1.bias", "model.1.layers.1.norm2.weight", "model.1.layers.1.norm2.bias", "model.1.layers.1.linear1.weight", "model.1.layers.1.linear2.weight", "model.1.layers.2.self_attn.in_proj_weight", "model.1.layers.2.self_attn.out_proj.weight", "model.1.layers.2.norm1.weight", "model.1.layers.2.norm1.bias", "model.1.layers.2.norm2.weight", "model.1.layers.2.norm2.bias", "model.1.layers.2.linear1.weight", "model.1.layers.2.linear2.weight", "model.1.layers.3.self_attn.in_proj_weight", "model.1.layers.3.self_attn.out_proj.weight", "model.1.layers.3.norm1.weight", "model.1.layers.3.norm1.bias", "model.1.layers.3.norm2.weight", "model.1.layers.3.norm2.bias", "model.1.layers.3.linear1.weight", "model.1.layers.3.linear2.weight"]
-            decoder_unexpected_keys = ["model.1.lstm.weight_ih_l0", "model.1.lstm.weight_hh_l0", "model.1.lstm.bias_ih_l0", "model.1.lstm.bias_hh_l0", "model.1.lstm.weight_ih_l1", "model.1.lstm.weight_hh_l1", "model.1.lstm.bias_ih_l1", "model.1.lstm.bias_hh_l1"]
 
             # 不加载量化器部分权重
             state_dict_raw = torch.load(self.resume_model, map_location=self.device)['state_dict']
@@ -421,12 +417,8 @@ class WavTokenizer(VocosExp):
                         if num <= 7:
                             state_dict_fa_qa[k[36:]] = v
                 if k.startswith('feature_extractor.encodec.encoder'):
-                    if k[34:] in encoder_unexpected_keys:
-                        continue
                     state_dict_fa_en[k[34:]] = v
                 if k.startswith('feature_extractor.encodec.decoder'):
-                    if k[34:] in decoder_unexpected_keys:
-                        continue
                     state_dict_fa_de[k[34:]] = v
                 if k.startswith('backbone.'):
                     state_dict_bb[k[9:]] = v
@@ -440,9 +432,8 @@ class WavTokenizer(VocosExp):
                     state_dict_dac[k[4:]] = v
             # breakpoint()
             # feature_extractor.encodec.quantizer.load_state_dict(state_dict_fa_qa, strict=True)
-            
-            feature_extractor.encodec.encoder.load_state_dict(state_dict_fa_en, strict=False)
-            feature_extractor.encodec.decoder.load_state_dict(state_dict_fa_de, strict=False)
+            feature_extractor.encodec.encoder.load_state_dict(state_dict_fa_en, strict=True)
+            feature_extractor.encodec.decoder.load_state_dict(state_dict_fa_de, strict=True)
             feature_extractor.encodec.quantizer.load_state_dict(state_dict_fa_qa, strict=True)
             backbone.load_state_dict(state_dict_bb, strict=True)
             head.load_state_dict(state_dict_hd, strict=True)

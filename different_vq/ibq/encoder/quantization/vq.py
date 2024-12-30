@@ -12,9 +12,9 @@ import typing as tp
 
 import torch
 from torch import nn
-from encoder.quantization.dac_vq import DACVQ
 
 from .core_vq import ResidualVectorQuantization,LanguageVectorQuantization
+from encoder.quantization.ibq1D import IndexPropagationQuantize1D
 
 
 @dataclass
@@ -62,16 +62,14 @@ class ResidualVectorQuantizer(nn.Module):
 
         # breakpoint()
 
-        self.vq = DACVQ(
-            input_dim=self.dimension,
-            n_codebooks=self.n_q,
-            codebook_size=self.bins,
-            codebook_dim=8,
+        self.vq = IndexPropagationQuantize1D(
+            n_e=self.bins,
+            e_dim=self.dimension,
         )
 
         # self.vq = LanguageVectorQuantization(
         #     dim=self.dimension,
-        #     codebook_size=self.bins,  
+        #     codebook_size=self.bins,
         #     num_quantizers=self.n_q,
         #     decay=self.decay,
         #     kmeans_init=self.kmeans_init,

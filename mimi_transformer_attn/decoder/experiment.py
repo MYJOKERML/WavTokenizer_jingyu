@@ -394,6 +394,8 @@ class WavTokenizer(VocosExp):
             # feature_extractor = instantiate_class(args=(), init=config['model']['init_args']["feature_extractor"])
             # backbone = instantiate_class(args=(), init=config['model']['init_args']["backbone"])
             # head = instantiate_class(args=(), init=config['model']['init_args']["head"])
+            backbone_missing_keys = ["pos_net.2.layers.0.self_attn.in_proj_weight", "pos_net.2.layers.0.self_attn.out_proj.weight", "pos_net.2.layers.0.norm1.weight", "pos_net.2.layers.0.norm1.bias", "pos_net.2.layers.0.norm2.weight", "pos_net.2.layers.0.norm2.bias", "pos_net.2.layers.0.linear1.weight", "pos_net.2.layers.0.linear2.weight", "pos_net.2.layers.1.self_attn.in_proj_weight", "pos_net.2.layers.1.self_attn.out_proj.weight", "pos_net.2.layers.1.norm1.weight", "pos_net.2.layers.1.norm1.bias", "pos_net.2.layers.1.norm2.weight", "pos_net.2.layers.1.norm2.bias", "pos_net.2.layers.1.linear1.weight", "pos_net.2.layers.1.linear2.weight", "pos_net.2.layers.2.self_attn.in_proj_weight", "pos_net.2.layers.2.self_attn.out_proj.weight", "pos_net.2.layers.2.norm1.weight", "pos_net.2.layers.2.norm1.bias", "pos_net.2.layers.2.norm2.weight", "pos_net.2.layers.2.norm2.bias", "pos_net.2.layers.2.linear1.weight", "pos_net.2.layers.2.linear2.weight", "pos_net.2.layers.3.self_attn.in_proj_weight", "pos_net.2.layers.3.self_attn.out_proj.weight", "pos_net.2.layers.3.norm1.weight", "pos_net.2.layers.3.norm1.bias", "pos_net.2.layers.3.norm2.weight", "pos_net.2.layers.3.norm2.bias", "pos_net.2.layers.3.linear1.weight", "pos_net.2.layers.3.linear2.weight"]
+            backbone_unexpected_keys = ["pos_net.2.norm.weight", "pos_net.2.norm.bias", "pos_net.2.q.weight", "pos_net.2.q.bias", "pos_net.2.k.weight", "pos_net.2.k.bias", "pos_net.2.v.weight", "pos_net.2.v.bias", "pos_net.2.proj_out.weight", "pos_net.2.proj_out.bias"]
 
             # 不加载量化器部分权重
             state_dict_raw = torch.load(self.resume_model, map_location=self.device)['state_dict']
@@ -421,6 +423,11 @@ class WavTokenizer(VocosExp):
                 if k.startswith('feature_extractor.encodec.decoder'):
                     state_dict_fa_de[k[34:]] = v
                 if k.startswith('backbone.'):
+                    # print("*****",k)
+                    if k[9:] in backbone_unexpected_keys:
+                        # ignore unexpected keys
+                        # print(f"\033[31m missing key: {k[9:]}\033[0m",)
+                        continue
                     state_dict_bb[k[9:]] = v
                 if k.startswith('head.'):
                     state_dict_hd[k[5:]] = v
@@ -435,7 +442,7 @@ class WavTokenizer(VocosExp):
             feature_extractor.encodec.encoder.load_state_dict(state_dict_fa_en, strict=True)
             feature_extractor.encodec.decoder.load_state_dict(state_dict_fa_de, strict=True)
             feature_extractor.encodec.quantizer.load_state_dict(state_dict_fa_qa, strict=True)
-            backbone.load_state_dict(state_dict_bb, strict=True)
+            backbone.load_state_dict(state_dict_bb, strict=False) # set strict=False to ignore unexpected keys
             head.load_state_dict(state_dict_hd, strict=True)
             self.feature_extractor = feature_extractor.to(self.device)
             self.backbone = backbone.to(self.device)

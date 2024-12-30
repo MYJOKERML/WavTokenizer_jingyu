@@ -45,21 +45,21 @@ def create_zip_archive(archive_name='archive.zip', base_dir='.'):
             # 从 dirs 中移除被忽略的目录，防止 os.walk 进入这些目录
             for d in dirs_to_remove:
                 dirs.remove(d)
-                print(f'\033[31mIgnoring directory: {os.path.join(rel_root, d)}\033[0m')
+                print(f'Ignoring directory: {os.path.join(rel_root, d)}')
 
             for file in files:
                 filepath = os.path.join(root, file)
                 relpath = os.path.normpath(os.path.join(rel_root, file))
                 # 检查是否被忽略
                 if combined_ignore(relpath):
-                    print(f'\033[31mIgnoring file: {relpath}\033[0m')
+                    print(f'Ignoring file: {relpath}')
                     continue
-                print(f'\033[32mZipping {relpath}\033[0m')
+                print(f'Zipping {relpath}')
                 # 添加文件到 Zip，使用相对路径
                 zipf.write(filepath, relpath)
     
     print(f"压缩完成：{archive_name}")
 
 if __name__ == "__main__":
-    archive_name = 'transformer_encoder_pretrained.zip'
+    archive_name = 'replace_dacvq.zip'
     create_zip_archive(archive_name=archive_name)

@@ -1,13 +1,10 @@
 from typing import Optional
-import typing as tp
 
 import torch
 from torch import nn
 from torch.nn.utils import weight_norm
 
 from decoder.modules import ConvNeXtBlock, ResBlock1, AdaLayerNorm
-from decoder.transformer import StreamingTransformer
-import torch.nn.functional as F
 
 
 def nonlinearity(x):
@@ -130,12 +127,10 @@ class AttnBlock(nn.Module):
         return x + h_
 
 def make_attn(in_channels, attn_type="vanilla"):
-    assert attn_type in ["vanilla", "linear", "none", "transformer"], f'attn_type {attn_type} unknown'
+    assert attn_type in ["vanilla", "linear", "none"], f'attn_type {attn_type} unknown'
     # print(f"making attention of type '{attn_type}' with {in_channels} in_channels")
     if attn_type == "vanilla":
         return AttnBlock(in_channels)
-    if attn_type == "transformer":
-        return StreamingTransformer(in_channels, 4, 5, dim_feedforward=in_channels*4)
 
 
 class Backbone(nn.Module):
@@ -176,7 +171,6 @@ class VocosBackbone(Backbone):
         num_layers: int,
         layer_scale_init_value: Optional[float] = None,
         adanorm_num_embeddings: Optional[int] = None,
-        attn_type="transformer",
     ):
         super().__init__()
         self.input_channels = input_channels
@@ -204,14 +198,14 @@ class VocosBackbone(Backbone):
         self.temb_ch = 0
         block_in = dim
         dropout = 0.1
-        self.attn_type = attn_type
+        attn_type="vanilla"
 
         pos_net : tp.List[nn.Module] = [
             ResnetBlock(in_channels=block_in,out_channels=block_in,
                         temb_channels=self.temb_ch,dropout=dropout),
             ResnetBlock(in_channels=block_in,out_channels=block_in,
                         temb_channels=self.temb_ch,dropout=dropout),
-            make_attn(block_in, attn_type=self.attn_type),
+            make_attn(block_in, attn_type=attn_type),
             ResnetBlock(in_channels=block_in,out_channels=block_in,
                     temb_channels=self.temb_ch,dropout=dropout),
             ResnetBlock(in_channels=block_in,out_channels=block_in,

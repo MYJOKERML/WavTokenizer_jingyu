@@ -27,8 +27,8 @@ out_folder = 'result/infer'
 # os.system("mkdir -p %s"%(tmptmp))
 
 # 自己数据模型加载
-config_path = "/home1/lujingyu/projects/WavTokenizer_jingyu/mimi_transformer_attn/configs/config.yaml"
-model_path = "/home1/lujingyu/projects/WavTokenizer_jingyu/ckpt/jingyu/mimi_decoder_ckpt_epoch113.ckpt"
+config_path = "/home1/lujingyu/projects/WavTokenizer_jingyu/different_vq/ibq/configs/config.yaml"
+model_path = "/home1/lujingyu/projects/WavTokenizer_jingyu/ckpt/jingyu/ibq_epoch63.ckpt"
 wavtokenizer = WavTokenizer.from_pretrained0802(config_path, model_path)
 wavtokenizer = wavtokenizer.to(device1)
 # wavtokenizer = wavtokenizer.to(device2)

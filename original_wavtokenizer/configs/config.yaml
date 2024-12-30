@@ -32,9 +32,9 @@ model:
     evaluate_pesq: true
     evaluate_periodicty: true
 
-    resume: false
-    resume_config: ./WavTokenizer/configs/wavtokenizer_smalldata_frame75_3s_nq1_code16384_dim512_kmeans800_attn.yaml
-    resume_model: ./WavTokenizer/result/train/wavtokenizer_smalldata_frame75_3s_nq1_code16384_dim512_kmeans800_attn/xxx.ckpt
+    resume: true
+    resume_config: configs/config.yaml
+    resume_model: /data/lujingyu_data/checkpoints/WavTokenizer/WavTokenizer_small_320_24k_4096.ckpt
 
     feature_extractor:
       class_path: decoder.feature_extractors.EncodecFeatures
@@ -44,7 +44,7 @@ model:
         train_codebooks: true
         num_quantizers: 1  
         dowmsamples: [8, 5, 4, 2]
-        vq_bins: 8192
+        vq_bins: 4096
         vq_kmeans: 200
 
     backbone:

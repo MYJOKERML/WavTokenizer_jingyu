@@ -15,7 +15,7 @@ device=torch.device('cuda:0')
 # 如果是ljspeech，需要更换路径，更换数据读取逻辑，更换stoi的采样率
 
 def main():
-    prepath="./Result/Minicodec/infer/dac_nq4_all"
+    prepath="/home1/lujingyu/projects/WavTokenizer_jingyu/different_vq/ibq/result/infer"
     rawpath="/data/lujingyu_data/datasets/LibriTTS/test/test-clean"
     # rawpath="./Data/LJSpeech-1.1/wavs"
     preaudio = os.listdir(prepath)

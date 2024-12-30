@@ -61,8 +61,6 @@ class EncodecFeatures(FeatureExtractor):
         dowmsamples: List[int] = [6, 5, 5, 4],
         vq_bins: int = 16384,
         vq_kmeans: int = 800,
-        encoder_attn: str = "lstm",
-        decoder_attn: str = "lstm",
     ):
         super().__init__()
 
@@ -73,11 +71,11 @@ class EncodecFeatures(FeatureExtractor):
         encoder = SEANetEncoder(causal=False, n_residual_layers=1, norm='weight_norm', pad_mode='reflect', lstm=2,
                                 dimension=512, channels=1, n_filters=32, ratios=dowmsamples, activation='ELU',
                                 kernel_size=7, residual_kernel_size=3, last_kernel_size=7, dilation_base=2,
-                                true_skip=False, compress=2, attn_type=encoder_attn)
+                                true_skip=False, compress=2)
         decoder = SEANetDecoder(causal=False, n_residual_layers=1, norm='weight_norm', pad_mode='reflect', lstm=2,
                                 dimension=512, channels=1, n_filters=32, ratios=[8, 5, 4, 2], activation='ELU',
                                 kernel_size=7, residual_kernel_size=3, last_kernel_size=7, dilation_base=2,
-                                true_skip=False, compress=2, attn_type=decoder_attn)
+                                true_skip=False, compress=2)
         quantizer = ResidualVectorQuantizer(dimension=512, n_q=n_q, bins=vq_bins, kmeans_iters=vq_kmeans,
                                             decay=0.99, kmeans_init=True)
 
